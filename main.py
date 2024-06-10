@@ -14,7 +14,7 @@ print(TOKEN)
 
 
 
-
+# A lot of this discord hierchy stuff is 
 class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
