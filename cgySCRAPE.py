@@ -28,6 +28,29 @@ from pathlib import Path
 
     # This is good!
 
+
+def game_format(my_dict): # This is the format for the last X games
+    home_team = my_dict["home"]["alias"]
+    away_team = my_dict["away"]["alias"]
+
+    home_score = my_dict["home_points"]
+    away_score = my_dict["away_points"]
+
+    my_date = my_dict["scheduled"][:10]
+
+    res = ""
+    if my_dict["home"]["alias"] == "CGY":   # This means flames are home
+        if home_score > away_score:
+            res = f"{away_team} at {home_team}:\tFLAMES WIN:\t{home_score}-{away_score} \t {my_date}"
+        else:
+            res = f"{away_team} at {home_team}:\tFLAMES LOSS:\t{home_score}-{away_score} \t {my_date}"
+    else:                                   # This means flames are away
+        if home_score > away_score:
+            res = f"{away_team} at {home_team}:\tFLAMES LOSS:\t{away_score}-{home_score} \t {my_date}"
+        else:
+            res = f"{away_team} at {home_team}:\tFLAMES WIN:\t{away_score}-{home_score} \t {my_date}"
+
+    return res # This is where 
 # Takes year as a string and will update a text file
  # or create a new file
 # a text file with the year 
@@ -69,15 +92,14 @@ def update(season):
 # Includes the date in the count! 
 # Cap num to something?
 # Sometimes the API makes a mistake
-def last_games(year,month, day, num):
-    my_test_file = Path(f"games/schedule{year}.txt")
-
+def last_games(season,year,month, day, num):
+    my_test_file = Path(f"games/schedule{season}.txt")
     # This is creating a file in the case that it does not exist
     if (not my_test_file.is_file()):
         return "Year is INVALID"
     
     # Now we can open
-    f = open(f"games/schedule{year}.txt", "r")
+    f = open(f"games/schedule{season}.txt", "r")
     data = f.read()
     if data == "":
         print("error")
@@ -88,41 +110,39 @@ def last_games(year,month, day, num):
     calgary_flames_games = [game for game in schedule['games'] if game['home']['name'] == 'Calgary Flames' or game['away']['name'] == 'Calgary Flames']
     # We now have an array of flames game dictionaries
     
-
+    closed_games = [game for game in calgary_flames_games if game["status"]=="closed"] # This is ensuring we ar getting only past games
     # print(calgary_flames_games[0]["scheduled"][:4]) # Year
     # print(calgary_flames_games[0]["scheduled"][5:7]) # Month
     # print(calgary_flames_games[0]["scheduled"][8:10]) # day
     # Remove all games that occur after this date 
+    my_op_comp = f"{str(year)}{str(month)}{str(day)}"
     
-    # You can make this cleaner but do later
-    closed_games = [game for game in calgary_flames_games if game["status"]=="closed"]
-    # before_year = [game for game in closed_games if (int(game["scheduled"][:4]) <= int(year))]
-    before_month = [game for game in closed_games if (int(game["scheduled"][5:7]) <= int(month))]
-    before_day = [game for game in before_month if (int(game["scheduled"][8:10]) <= int(day))]
-    
-    
-    
-    
+    #before_day = [game for game in calgary_flames_games if (int(my_op_comp)  >= int(f"{game["scheduled"][:4]}{game["scheduled"][5:7]}{game["scheduled"][8:10]}"))]
+    before_day = [
+    game for game in closed_games
+    if int(my_op_comp) >= int(f"{game['scheduled'][:4]}{game['scheduled'][5:7]}{game['scheduled'][8:10]}")
+]
+    before_day.reverse()
+
     res = ""
-    if num > len(before_day):
-        res += "Not enough games for year\n"
-
-        for i in range(len(before_day)):
-            temp = before_day[i]["scheduled"]
-            res += f"{temp}\n"
-
+    if len(before_day) < num:
+        res += "\t\tNot enough games\n"
+        for i in before_day:
+            res += f"{game_format(i)}\n"
     else:
         for i in range(num):
-            temp = before_day[i]["scheduled"]
-            res += f"{temp}\n"
+            res += f"{game_format(before_day[i])}\n"
+    # Arguements need to be fixed here but this is a start
+    return res
 
-    print(res)
 
-# update("2023") # We are going to assume that update now works corrects
-# update("2023")
-# last_games("2023-2024", "02", "15",5)
+# Same args    
+def next_games(season, year, month, day, num):
+    pass
 
-update("2023-2024")
+
+#update("2023-2024")
+#print(last_games("2023-2024", "2023", "11", "01",100))
 
 # Make a note that this API can make errors
 
