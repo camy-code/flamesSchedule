@@ -27,6 +27,22 @@ from pathlib import Path
     # print(game["away"]["name"])
 
     # This is good!
+def game_format_future(my_dict): # This is the format for the last X games
+    home_team = my_dict["home"]["alias"]
+    away_team = my_dict["away"]["alias"]
+
+
+    my_date = my_dict["scheduled"][:10]
+
+    res = ""
+    if my_dict["home"]["alias"] == "CGY":   # This means flames are home
+        res = f"{away_team} at {home_team}:\t {my_date}"
+    else:                                   # This means flames are away
+        res = f"{away_team} at {home_team}\t {my_date}"
+   
+
+    return res # This is where 
+
 
 
 def game_format(my_dict): # This is the format for the last X games
@@ -96,7 +112,7 @@ def last_games(season,year,month, day, num):
     my_test_file = Path(f"games/schedule{season}.txt")
     # This is creating a file in the case that it does not exist
     if (not my_test_file.is_file()):
-        return "Year is INVALID"
+        return "Season is INVALID or not in DB"
     
     # Now we can open
     f = open(f"games/schedule{season}.txt", "r")
@@ -138,11 +154,59 @@ def last_games(season,year,month, day, num):
 
 # Same args    
 def next_games(season, year, month, day, num):
-    pass
+    my_test_file = Path(f"games/schedule{season}.txt")
+    # This is creating a file in the case that it does not exist
+    if (not my_test_file.is_file()):
+        return "Season is INVALID or not in DB"
+    
+    # Now we can open
+    f = open(f"games/schedule{season}.txt", "r")
+    data = f.read()
+    if data == "":
+        print("error")
+        return "Not in DB"
+
+    f.close()
+    schedule = json.loads(data)
+    calgary_flames_games = [game for game in schedule['games'] if game['home']['name'] == 'Calgary Flames' or game['away']['name'] == 'Calgary Flames']
+    # We now have an array of flames game dictionaries
+    
+    
+    # print(calgary_flames_games[0]["scheduled"][:4]) # Year
+    # print(calgary_flames_games[0]["scheduled"][5:7]) # Month
+    # print(calgary_flames_games[0]["scheduled"][8:10]) # day
+    # Remove all games that occur after this date 
+    my_op_comp = f"{str(year)}{str(month)}{str(day)}"
+    
+    #before_day = [game for game in calgary_flames_games if (int(my_op_comp)  >= int(f"{game["scheduled"][:4]}{game["scheduled"][5:7]}{game["scheduled"][8:10]}"))]
+    after_day = [
+    game for game in calgary_flames_games
+    if int(my_op_comp) <= int(f"{game['scheduled'][:4]}{game['scheduled'][5:7]}{game['scheduled'][8:10]}")
+]
+    if after_day == []:
+        return f"No upcoming games for {season}"
+    
+
+    res = ""
+    if len(after_day) < num:
+        res += "\t\tNot enough games\n"
+        for i in after_day:
+            res += f"{game_format_future(i)}\n"
+    else:
+        for i in range(num):
+            res += f"{game_format_future(after_day[i])}\n"
+    # Arguements need to be fixed here but this is a start
+    return res
+
 
 
 #update("2023-2024")
 #print(last_games("2023-2024", "2023", "11", "01",100))
+
+print("upcoming games")
+print(next_games("2023-2024", "2024", "04", "10",100))
+
+
 
 # Make a note that this API can make errors
 
