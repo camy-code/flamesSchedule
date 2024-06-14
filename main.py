@@ -28,6 +28,9 @@ class My_calender():
     def setTime(self, myDate):
         self.getTime = myDate
 
+    def setTimeTODAY(self):
+        self.today_date = str(datetime.datetime.now())[:10]
+
     def getDay(self):
         return self.today_date[8:10]
     def getMonth(self):
@@ -60,7 +63,8 @@ my_season = My_season() # default is 2023-2024 season
 """The following is how our bot interacts with our code."""
 class MyClient(discord.Client):
     async def on_ready(self):
-        print(f'Logged on as {self.user}!')
+        print(f'Logged on as {self.user}!') 
+        
 
     async def on_message(self, message):
         if message.author.id == self.user.id:
@@ -75,6 +79,21 @@ class MyClient(discord.Client):
         if message.content.startswith("!update"): # ONE
             pass
         elif message.content.startswith("!setDay"): # TWO
+            if len (my_arr) == 4 or len(my_arr) == 2:
+                if len(my_arr) == 2 and my_arr[1] == "today":
+                    my_day.setTimeTODAY()
+                    return await message.channel.send("Date set to today")
+                elif len(my_arr) == 2:
+                    return await message.channel.send("\"today\" is how we set today")
+                
+                if len(my_arr) == 4:
+                    pass 
+                    # Now we need to check day and such but that will be fore later. 
+                    # This is where we left off
+                
+            else:
+                return await message.channel.send("Incorrect args: today or year month day")
+
             pass
         elif message.content.startswith("!lastGames"): # THREE
             pass
