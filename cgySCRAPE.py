@@ -4,29 +4,10 @@ from dotenv import load_dotenv
 import json
 
 from pathlib import Path
-# load_dotenv()
-# KEY = os.getenv('NHLKEY')
-# year = "2023"
-# print(KEY)
-# url = f"https://api.sportradar.com/nhl/trial/v7/en/games/{year}/REG/schedule.json?api_key={KEY}"
 
-# headers = {"accept": "application/json"}
 
-# response = requests.get(url, headers=headers)
-# data =(response.text)
-# print("The response code is ",response.status_code)
-
-#schedule = json.loads(data)
-
-# Extract games involving Calgary Flames
-#calgary_flames_games = [game for game in schedule['games'] if game['home']['name'] == 'Calgary Flames' or game['away']['name'] == 'Calgary Flames']
-
-# Print the games involving Calgary Flames
-# for game in calgary_flames_games:
-#     print(json.dumps(game, indent=2))
-    # print(game["away"]["name"])
-
-    # This is good!
+# -----------START of String format for games----------- #
+""""The following formats an UPCOMING game entry to what we desire as string output"""
 def game_format_future(my_dict): # This is the format for the last X games
     home_team = my_dict["home"]["alias"]
     away_team = my_dict["away"]["alias"]
@@ -43,8 +24,7 @@ def game_format_future(my_dict): # This is the format for the last X games
 
     return res # This is where 
 
-
-
+""""The following formats an PAST game entry to what we desire as string output"""
 def game_format(my_dict): # This is the format for the last X games
     home_team = my_dict["home"]["alias"]
     away_team = my_dict["away"]["alias"]
@@ -67,9 +47,17 @@ def game_format(my_dict): # This is the format for the last X games
             res = f"{away_team} at {home_team}:\tFLAMES WIN:\t{away_score}-{home_score} \t {my_date}"
 
     return res # This is where 
+
+# -----------END of String format for games----------- #
+
 # Takes year as a string and will update a text file
- # or create a new file
-# a text file with the year 
+
+"""Parameters:
+- season (string): The season we wish to search, needs to be of format "year-year" ie "2023-2024"
+
+Output: On success will return success message and write to the fie. On a failure we give an error message 
+and do no writing to any file. Will create a file if it does not exist
+"""
 def update(season):
    
     # Check if the file exists
@@ -91,7 +79,7 @@ def update(season):
 
     response = requests.get(url, headers=headers)
     data =(response.text)
-    print("The response code is ",response.status_code)
+    
 
     if (response.status_code != 200):
         print("Error with the API")
@@ -104,10 +92,15 @@ def update(season):
     return "The data has been UPDATED!"
     
 
-# Takes a date and returns the last games played for the flames as of that date
-# Includes the date in the count! 
-# Cap num to something?
-# Sometimes the API makes a mistake
+"""Parameters:
+- season (string): The season we wish to search, needs to be of format "year-year" ie "2023-2024"
+- year (string) : The year we want to start at needs to be of length 4. IE 2 = "2023"
+-month (string): The month we want to start at needs to be of length 2. IE 5 = "05"
+-day (string): The date we want to start at needs to be of length 2. IE 2 = "02"
+-num (int): The number of previous games we desire, 1 <= num <= 82
+
+Output: returns a string of the last num amount of games following the dates in the arguements
+"""
 def last_games(season,year,month, day, num):
     my_test_file = Path(f"games/schedule{season}.txt")
     # This is creating a file in the case that it does not exist
@@ -152,7 +145,15 @@ def last_games(season,year,month, day, num):
     return res
 
 
-# Same args    
+"""Parameters:
+- season (string): The season we wish to search, needs to be of format "year-year" ie "2023-2024"
+- year (string) : The year we want to start at needs to be of length 4. IE 2 = "2023"
+-month (string): The month we want to start at needs to be of length 2. IE 5 = "05"
+-day (string): The date we want to start at needs to be of length 2. IE 2 = "02"
+-num (int): The number of future games we desire, 1 <= num <= 82
+
+Output: returns a string of the NEXT num amount of games following the dates in the arguements
+"""   
 def next_games(season, year, month, day, num):
     my_test_file = Path(f"games/schedule{season}.txt")
     # This is creating a file in the case that it does not exist
@@ -187,7 +188,7 @@ def next_games(season, year, month, day, num):
         return f"No upcoming games for {season}"
     
 
-    res = ""
+    res = "Upcoming Games"
     if len(after_day) < num:
         res += "\t\tNot enough games\n"
         for i in after_day:
@@ -197,17 +198,3 @@ def next_games(season, year, month, day, num):
             res += f"{game_format_future(after_day[i])}\n"
     # Arguements need to be fixed here but this is a start
     return res
-
-
-
-#update("2023-2024")
-#print(last_games("2023-2024", "2023", "11", "01",100))
-
-print("upcoming games")
-print(next_games("2023-2024", "2024", "04", "10",100))
-
-
-
-# Make a note that this API can make errors
-
-
