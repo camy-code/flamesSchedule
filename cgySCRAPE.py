@@ -37,14 +37,14 @@ def game_format(my_dict): # This is the format for the last X games
     res = ""
     if my_dict["home"]["alias"] == "CGY":   # This means flames are home
         if home_score > away_score:
-            res = f"{away_team} at {home_team}:\tFLAMES WIN:\t{home_score}-{away_score} \t {my_date}"
+            res = f"{away_team} at {home_team}:FLAMES WIN:{home_score}-{away_score} \t {my_date}"
         else:
-            res = f"{away_team} at {home_team}:\tFLAMES LOSS:\t{home_score}-{away_score} \t {my_date}"
+            res = f"{away_team} at {home_team}:FLAMES LOSS:{home_score}-{away_score} \t {my_date}"
     else:                                   # This means flames are away
         if home_score > away_score:
-            res = f"{away_team} at {home_team}:\tFLAMES LOSS:\t{away_score}-{home_score} \t {my_date}"
+            res = f"{away_team} at {home_team}:FLAMES LOSS:{away_score}-{home_score} \t {my_date}"
         else:
-            res = f"{away_team} at {home_team}:\tFLAMES WIN:\t{away_score}-{home_score} \t {my_date}"
+            res = f"{away_team} at {home_team}:FLAMES WIN:{away_score}-{home_score} \t {my_date}"
 
     return res # This is where 
 
@@ -57,6 +57,8 @@ def game_format(my_dict): # This is the format for the last X games
 
 Output: On success will return success message and write to the fie. On a failure we give an error message 
 and do no writing to any file. Will create a file if it does not exist
+
+Sometimes the API does not go too far back in time so we know this is not a logical error
 """
 def update(season):
    
@@ -188,7 +190,7 @@ def next_games(season, year, month, day, num):
         return f"No upcoming games for {season}"
     
 
-    res = "Upcoming Games"
+    res = "Upcoming Games\n"
     if len(after_day) < num:
         res += "\t\tNot enough games\n"
         for i in after_day:
@@ -198,3 +200,5 @@ def next_games(season, year, month, day, num):
             res += f"{game_format_future(after_day[i])}\n"
     # Arguements need to be fixed here but this is a start
     return res
+
+
