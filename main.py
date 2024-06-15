@@ -144,7 +144,7 @@ class MyClient(discord.Client):
                 
             else:
                 return await message.channel.send("Incorrects args: enter integer between 1 and 82")            
-            pass
+            
         elif message.content.startswith("!setSeason"): # FIVE, complete
             if len(my_arr) == 2:
                 if checkSeason(my_arr[1]):
