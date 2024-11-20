@@ -163,6 +163,19 @@ class MyClient(discord.Client):
         elif message.content == "!getSeason":
             return await message.channel.send(f"{my_season.getSeason()}")
         elif message.content.startswith("!help"): # SIX
+            help_text = """
+**Bot Commands:**
+1. `!update SEASON` - Updates data for the specified season. Example: `!update 2023-2024`
+2. `!setDay today` or `!setDay YEAR MONTH DAY` - Sets the date to "today" or a specific date. Example: `!setDay 2023 10 21`
+3. `!getDay` - Displays the currently set date.
+4. `!lastGames NUMBER` - Shows the last NUMBER of games from the current date. Example: `!lastGames 5`
+5. `!nextGames NUMBER` - Shows the next NUMBER of games from the current date. Example: `!nextGames 5`
+6. `!setSeason SEASON` - Sets the season. Example: `!setSeason 2023-2024`
+7. `!getSeason` - Displays the current season.
+
+**Note**: For `SEASON`, use format `YYYY-YYYY`. For `NUMBER`, enter an integer between 1 and 82.
+"""
+            await message.channel.send(help_text)
             pass
         
         
